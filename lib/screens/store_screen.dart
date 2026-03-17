@@ -1,9 +1,8 @@
-// ไฟล์: lib/screens/store_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/deck_provider.dart';
 import '../services/audio_service.dart';
+import '../widgets/frame_painter.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
@@ -12,6 +11,12 @@ class StoreScreen extends StatelessWidget {
     'กรอบไม้ธรรมชาติ 🪵': 200,
     'กรอบทองคำขาว 💎': 500,
     'กรอบออร่าพาสเทล ✨': 350,
+    'กรอบดาวทอง ⭐': 300,
+    'กรอบแมว 🐱': 400,
+    'กรอบไฟฟ้า ⚡': 350,
+    'กรอบเพชร 💎✨': 450,
+    'กรอบไฟ 🔥': 400,
+    'กรอบเปลวสี 🌈': 500,
   };
 
   @override
@@ -78,7 +83,6 @@ class StoreScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // คำอธิบาย
         Container(
           padding: const EdgeInsets.all(14),
           margin: const EdgeInsets.only(bottom: 16),
@@ -89,10 +93,9 @@ class StoreScreen extends StatelessWidget {
           ),
           child: const Text(
             '🃏 ธีมการ์ด = สีของสำรับ\nเลือกธีมแล้วสีสำรับจะเปลี่ยนตามอัตโนมัติ\nไปตั้งค่าที่หน้าแก้ไขสำรับ (กด ⋮ → ปรับแต่งสำรับ)',
-            style: TextStyle(fontSize: 13, color: null, height: 1.5),
+            style: TextStyle(fontSize: 13, height: 1.5),
           ),
         ),
-
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
@@ -131,13 +134,11 @@ class StoreScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Preview: 2 mini cards
                     SizedBox(
                       height: 80,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // back card (เลื่อนซ้าย)
                           Positioned(
                             left: 20,
                             child: _miniCard(
@@ -146,7 +147,6 @@ class StoreScreen extends StatelessWidget {
                               isBack: true,
                             ),
                           ),
-                          // front card (เลื่อนขวา)
                           Positioned(
                             right: 20,
                             child: _miniCard(
@@ -248,7 +248,6 @@ class StoreScreen extends StatelessWidget {
   ) {
     final price = theme['price'] as int;
     final name = '${theme['emoji']} ${theme['name']}';
-
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -283,7 +282,7 @@ class StoreScreen extends StatelessWidget {
     );
   }
 
-  // ── Tab 3: ไอคอนสำรับ 🆕 ─────────────────────────────────────
+  // ── Tab 2: ไอคอนสำรับ ────────────────────────────────────────
 
   Widget _buildDeckIconTab(BuildContext context, DeckProvider provider) {
     final icons = DeckProvider.deckIconCatalog;
@@ -302,10 +301,9 @@ class StoreScreen extends StatelessWidget {
           ),
           child: const Text(
             '🏷️ ไอคอนสำรับ เปลี่ยนไอคอนที่แสดงในหน้าหลัก\nซื้อแล้วไปตั้งค่าที่หน้าแก้ไขสำรับ',
-            style: TextStyle(fontSize: 13, color: null, height: 1.5),
+            style: TextStyle(fontSize: 13, height: 1.5),
           ),
         ),
-
         GridView.count(
           crossAxisCount: 3,
           shrinkWrap: true,
@@ -316,7 +314,6 @@ class StoreScreen extends StatelessWidget {
           children: icons.map((icon) {
             final isUnlocked = unlockedIcons.contains(icon['id']);
             final price = icon['price'] as int;
-
             return GestureDetector(
               onTap: isUnlocked
                   ? null
@@ -388,7 +385,6 @@ class StoreScreen extends StatelessWidget {
   ) {
     final price = icon['price'] as int;
     final name = '${icon['emoji']} ${icon['name']}';
-
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -423,7 +419,7 @@ class StoreScreen extends StatelessWidget {
     );
   }
 
-  // ── Tab 4: กรอบ & ตู้ปลา (ใช้ Widget แยกเพื่อหลีกเลี่ยง nested DefaultTabController) ──
+  // ── Tab 3: กรอบ & ตู้ปลา ─────────────────────────────────────
 
   Widget _buildItemAndFishTab(BuildContext context, DeckProvider provider) {
     return _InnerFishItemTab(
@@ -432,7 +428,7 @@ class StoreScreen extends StatelessWidget {
     );
   }
 
-  // ── กรอบโปรไฟล์ ───────────────────────────────────────────────
+  // ── กรอบโปรไฟล์ ──────────────────────────────────────────────
 
   Widget _buildItemTab(BuildContext context, DeckProvider provider) {
     final user = provider.user;
@@ -443,47 +439,134 @@ class StoreScreen extends StatelessWidget {
           'กรอบโปรไฟล์พิเศษ 🖼️',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 10),
-        ...avatarFrames.entries.map((entry) {
-          final isUnlocked = user.unlockedFrames.contains(entry.key);
-          final isEquipped = user.selectedFrame == entry.key;
-          return ListTile(
-            leading: const CircleAvatar(child: Icon(Icons.person_outline)),
-            title: Text(entry.key),
-            subtitle: Text(
-              isUnlocked ? 'เป็นเจ้าของแล้ว ✨' : 'ราคา ${entry.value} เหรียญ',
-            ),
-            trailing: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isEquipped
-                    ? Colors.grey
-                    : (isUnlocked ? const Color(0xFFA3C9A8) : null),
+        const SizedBox(height: 12),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.8,
+          children: avatarFrames.entries.map((entry) {
+            final isUnlocked = user.unlockedFrames.contains(entry.key);
+            final isEquipped = user.selectedFrame == entry.key;
+            return Container(
+              decoration: BoxDecoration(
+                color: isEquipped
+                    ? const Color(0xFFA3C9A8).withOpacity(0.15)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isEquipped
+                      ? const Color(0xFFA3C9A8)
+                      : Colors.grey.withOpacity(0.2),
+                  width: isEquipped ? 2 : 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 6,
+                  ),
+                ],
               ),
-              onPressed: isEquipped
-                  ? null
-                  : () {
-                      if (isUnlocked) {
-                        provider.updateSelectedFrame(entry.key);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('สวมใส่กรอบรูปเรียบร้อย! ✨'),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // ✅ Preview กรอบ
+                  SizedBox(
+                    width: 90,
+                    height: 90,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 36,
+                          backgroundColor: const Color(0xFFA3C9A8),
+                          child: const Icon(
+                            Icons.person,
+                            color: Colors.white,
+                            size: 36,
                           ),
-                        );
-                      } else {
-                        _confirmBuyFrame(
-                          context,
-                          provider,
-                          entry.key,
-                          entry.value,
-                        );
-                      }
-                    },
-              child: Text(
-                isEquipped ? 'ใช้อยู่' : (isUnlocked ? 'ใช้งาน' : 'ซื้อ'),
+                        ),
+                        // ✅ ใช้ FramePainter (ไม่มี underscore)
+                        SizedBox(
+                          width: 82,
+                          height: 82,
+                          child: CustomPaint(painter: FramePainter(entry.key)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    entry.key,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isUnlocked ? 'มีแล้ว ✨' : '💰 ${entry.value}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: isUnlocked
+                          ? const Color(0xFFA3C9A8)
+                          : Colors.orange,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 32,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isEquipped
+                            ? Colors.grey
+                            : const Color(0xFFA3C9A8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: isEquipped
+                          ? null
+                          : () {
+                              if (isUnlocked) {
+                                provider.updateSelectedFrame(entry.key);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('สวมใส่กรอบรูปเรียบร้อย! ✨'),
+                                  ),
+                                );
+                              } else {
+                                _confirmBuyFrame(
+                                  context,
+                                  provider,
+                                  entry.key,
+                                  entry.value,
+                                );
+                              }
+                            },
+                      child: Text(
+                        isEquipped
+                            ? 'ใช้อยู่'
+                            : (isUnlocked ? 'ใช้งาน' : 'ซื้อ'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          );
-        }),
+            );
+          }).toList(),
+        ),
       ],
     );
   }
@@ -531,11 +614,9 @@ class StoreScreen extends StatelessWidget {
 
   Widget _buildFishTab(BuildContext context, DeckProvider provider) {
     final tank = provider.fishTank;
-
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // อาหารปลา
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -599,9 +680,7 @@ class StoreScreen extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(height: 20),
-
         const Text(
           'ปลา 🐠',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -612,7 +691,6 @@ class StoreScreen extends StatelessWidget {
           style: const TextStyle(color: Colors.grey, fontSize: 13),
         ),
         const SizedBox(height: 10),
-
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
@@ -635,7 +713,6 @@ class StoreScreen extends StatelessWidget {
             );
           }).toList(),
         ),
-
         const SizedBox(height: 24),
         _buildDecorSection(context, provider, '🪨 พื้นกรวด', 'floor'),
         const SizedBox(height: 16),
@@ -658,7 +735,6 @@ class StoreScreen extends StatelessWidget {
     final items = DeckProvider.decorCatalog
         .where((d) => d['category'] == category)
         .toList();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -873,7 +949,6 @@ class StoreScreen extends StatelessWidget {
   ) {
     final ctrl = TextEditingController(text: '1');
     final canAdd = 20 - provider.fishTank.fishes.length;
-
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -882,7 +957,6 @@ class StoreScreen extends StatelessWidget {
           final actualQty = qty.clamp(1, canAdd > 0 ? canAdd : 1);
           final total = price * actualQty;
           final canAfford = provider.user.coins >= total;
-
           return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -993,7 +1067,9 @@ class StoreScreen extends StatelessWidget {
                         String msg;
                         if (result.startsWith('partial')) {
                           final got = result.split(':')[1];
-                          msg = 'ซื้อได้ $got ตัว (ตู้เหลือที่ว่างแค่นั้น) 🐠';
+                          msg =
+                              'ซื้อได้ $got ตัว '
+                              '(ตู้เหลือที่ว่างแค่นั้น) 🐠';
                           AudioService.instance.playPurchase();
                         } else if (result.startsWith('success')) {
                           msg = 'ซื้อ $name $actualQty ตัวแล้ว! 🐠';
@@ -1023,7 +1099,6 @@ class StoreScreen extends StatelessWidget {
 
   void _showBuyFoodDialog(BuildContext context, DeckProvider provider) {
     final ctrl = TextEditingController(text: '1');
-
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -1032,7 +1107,6 @@ class StoreScreen extends StatelessWidget {
           final safeQty = qty.clamp(1, 999);
           final total = 30 * safeQty;
           final canAfford = provider.user.coins >= total;
-
           return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -1177,17 +1251,15 @@ class StoreScreen extends StatelessWidget {
   }
 }
 
-// ── _InnerFishItemTab — StatefulWidget แยกสำหรับ nested tab ────────────────
+// ── _InnerFishItemTab ─────────────────────────────────────────────
 
 class _InnerFishItemTab extends StatefulWidget {
   final Widget itemTabContent;
   final Widget fishTabContent;
-
   const _InnerFishItemTab({
     required this.itemTabContent,
     required this.fishTabContent,
   });
-
   @override
   State<_InnerFishItemTab> createState() => _InnerFishItemTabState();
 }
@@ -1212,14 +1284,21 @@ class _InnerFishItemTabState extends State<_InnerFishItemTab>
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TabBar(
-          controller: _ctrl,
-          indicatorColor: const Color(0xFFA3C9A8),
-          labelColor: null,
-          tabs: const [
-            Tab(text: 'กรอบโปรไฟล์ 🖼️'),
-            Tab(text: 'ตู้ปลา 🐠'),
-          ],
+        Material(
+          color:
+              Theme.of(context).appBarTheme.backgroundColor ??
+              const Color(0xFFFFF9F0),
+          child: TabBar(
+            controller: _ctrl,
+            indicatorColor: const Color(0xFFA3C9A8),
+            labelColor: null,
+            indicatorSize: TabBarIndicatorSize.tab,
+            padding: EdgeInsets.zero,
+            tabs: const [
+              Tab(text: 'กรอบโปรไฟล์ 🖼️'),
+              Tab(text: 'ตู้ปลา 🐠'),
+            ],
+          ),
         ),
         Expanded(
           child: TabBarView(

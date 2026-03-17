@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../providers/deck_provider.dart';
 import '../models/deck_model.dart';
+import '../widgets/frame_painter.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -324,19 +325,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Color _getFrameColor(String? frameName) {
-    switch (frameName) {
-      case 'กรอบไม้ธรรมชาติ 🪵':
-        return Colors.brown;
-      case 'กรอบทองคำขาว 💎':
-        return Colors.amber;
-      case 'กรอบออร่าพาสเทล ✨':
-        return Colors.purpleAccent.shade100;
-      default:
-        return Colors.transparent;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final deckProvider = Provider.of<DeckProvider>(context);
@@ -540,16 +528,10 @@ class ProfileScreen extends StatelessWidget {
               : null,
         ),
         if (user.selectedFrame != null)
-          Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: _getFrameColor(user.selectedFrame),
-                width: 10,
-              ),
-            ),
+          SizedBox(
+            width: 170,
+            height: 170,
+            child: CustomPaint(painter: FramePainter(user.selectedFrame!)),
           ),
         Positioned(
           bottom: 5,
