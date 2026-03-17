@@ -228,42 +228,42 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.image_outlined),
-                        label: Text(
-                          selectedImagePath != null
-                              ? 'เปลี่ยนรูปพื้นหลัง'
-                              : 'เลือกรูปพื้นหลัง',
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () async {
-                          final path = await _pickImage();
-                          if (path != null)
-                            setStateModal(() => selectedImagePath = path);
-                        },
-                      ),
-                    ),
-                    if (selectedImagePath != null) ...[
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: Colors.redAccent,
-                        ),
-                        onPressed: () =>
-                            setStateModal(() => selectedImagePath = null),
-                      ),
-                    ],
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: OutlinedButton.icon(
+                //         icon: const Icon(Icons.image_outlined),
+                //         label: Text(
+                //           selectedImagePath != null
+                //               ? 'เปลี่ยนรูปพื้นหลัง'
+                //               : 'เลือกรูปพื้นหลัง',
+                //         ),
+                //         style: OutlinedButton.styleFrom(
+                //           padding: const EdgeInsets.symmetric(vertical: 12),
+                //           shape: RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(12),
+                //           ),
+                //         ),
+                //         onPressed: () async {
+                //           final path = await _pickImage();
+                //           if (path != null)
+                //             setStateModal(() => selectedImagePath = path);
+                //         },
+                //       ),
+                //     ),
+                //     if (selectedImagePath != null) ...[
+                //       const SizedBox(width: 8),
+                //       IconButton(
+                //         icon: const Icon(
+                //           Icons.delete_outline,
+                //           color: Colors.redAccent,
+                //         ),
+                //         onPressed: () =>
+                //             setStateModal(() => selectedImagePath = null),
+                //       ),
+                //     ],
+                //   ],
+                // ),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
@@ -1297,16 +1297,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                               ),
                             ),
                           ),
-                          trailing: _selectMode
-                              ? null
-                              : IconButton(
-                                  icon: Icon(
-                                    Icons.more_horiz,
-                                    color: Colors.grey[400],
-                                  ),
-                                  onPressed: () =>
-                                      _showCardOptions(context, deck, card),
-                                ),
+                          trailing: _selectMode ? null : null,
                           onTap: _selectMode
                               ? () => setState(() {
                                   if (isSelected)
@@ -1314,7 +1305,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                                   else
                                     _selectedIds.add(card.id);
                                 })
-                              : null,
+                              : () => _showCardOptions(context, deck, card),
                         ),
                       );
                     },

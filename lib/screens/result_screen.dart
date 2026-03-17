@@ -36,7 +36,7 @@ class ResultScreen extends StatelessWidget {
     final double percent = totalCards > 0 ? remembered / totalCards : 0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF9F0),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -92,7 +92,7 @@ class ResultScreen extends StatelessWidget {
                       color: stars >= 3
                           ? Colors.amber
                           : stars >= 2
-                          ? const Color(0xFFA3C9A8)
+                          ? Theme.of(context).primaryColor
                           : stars >= 1
                           ? Colors.orange
                           : Colors.redAccent,
@@ -118,7 +118,7 @@ class ResultScreen extends StatelessWidget {
                   _buildStatBox(
                     'จำได้ ✅',
                     '$remembered ใบ',
-                    const Color(0xFFA3C9A8),
+                    Theme.of(context).primaryColor,
                   ),
                   _buildStatBox('ลืม ❌', '$forgot ใบ', const Color(0xFFE5B299)),
                   _buildStatBox(
@@ -199,7 +199,7 @@ class ResultScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFA3C9A8),
+                        backgroundColor: Theme.of(context).primaryColor,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -267,7 +267,7 @@ class ResultScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       side: BorderSide(
                         color: remembered
-                            ? const Color(0xFFA3C9A8)
+                            ? Theme.of(context).primaryColor
                             : Colors.redAccent,
                         width: 1.5,
                       ),
@@ -282,7 +282,7 @@ class ResultScreen extends StatelessWidget {
                               Icon(
                                 remembered ? Icons.check_circle : Icons.cancel,
                                 color: remembered
-                                    ? const Color(0xFFA3C9A8)
+                                    ? Theme.of(context).primaryColor
                                     : Colors.redAccent,
                                 size: 20,
                               ),
@@ -292,7 +292,7 @@ class ResultScreen extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: remembered
-                                      ? const Color(0xFFA3C9A8)
+                                      ? Theme.of(context).primaryColor
                                       : Colors.redAccent,
                                 ),
                               ),

@@ -51,8 +51,6 @@ class StoreScreen extends StatelessWidget {
           bottom: const TabBar(
             indicatorColor: Color(0xFFA3C9A8),
             labelColor: null,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
             tabs: [
               Tab(text: 'ธีมการ์ด 🃏'),
               Tab(text: 'ไอคอนสำรับ'),

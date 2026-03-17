@@ -155,7 +155,7 @@ class _StudyScreenState extends State<StudyScreen> {
           const SizedBox(width: 8),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFA3C9A8),
+              backgroundColor: Theme.of(context).primaryColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -381,7 +381,7 @@ class _StudyScreenState extends State<StudyScreen> {
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFA3C9A8),
+                      backgroundColor: Theme.of(context).primaryColor,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 12,

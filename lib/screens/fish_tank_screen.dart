@@ -230,10 +230,10 @@ class _FishTankScreenState extends State<FishTankScreen>
     final user = provider.user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF9F0),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('ตู้ปลาของฉัน 🐠'),
-        backgroundColor: const Color(0xFFFFF9F0),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         actions: [
           Container(
@@ -443,39 +443,6 @@ class _FishTankScreenState extends State<FishTankScreen>
                   ),
                 ),
 
-                // ── Debug Buttons ───────────────────────
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        final p = context.read<DeckProvider>();
-                        p.fishTank.foodLevel = (p.fishTank.foodLevel - 20)
-                            .clamp(0, 100);
-                        if (p.fishTank.foodLevel <= 0) {
-                          p.fishTank.fishes.clear();
-                        }
-                        p.debugNotify();
-                      },
-                      child: const Text(
-                        '🍤 -20%',
-                        style: TextStyle(color: Colors.orange),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        final p = context.read<DeckProvider>();
-                        p.fishTank.foodLevel = 0;
-                        p.fishTank.fishes.clear();
-                        p.debugNotify(); // ✅ แก้แล้ว
-                      },
-                      child: const Text(
-                        '💀 Kill All',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
-                ),
 
                 // ── จำนวนปลา + ปุ่มจัดการ ──────────────
                 if (tank.fishes.isNotEmpty)
