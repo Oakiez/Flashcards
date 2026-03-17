@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/deck_provider.dart';
 import '../models/deck_model.dart';
+import '../widgets/fish_painter.dart';
 
 class FishTankScreen extends StatefulWidget {
   const FishTankScreen({super.key});
@@ -443,7 +444,6 @@ class _FishTankScreenState extends State<FishTankScreen>
                   ),
                 ),
 
-
                 // ── จำนวนปลา + ปุ่มจัดการ ──────────────
                 if (tank.fishes.isNotEmpty)
                   Padding(
@@ -566,65 +566,67 @@ class _FishTankScreenState extends State<FishTankScreen>
     }
   }
 
+  // ── จัดวาง: ฝั่งซ้าย = พืช, กลาง = ปะการัง/หิน, ขวา = ปราสาท/สมอ ──
+
   Widget _buildPlant(BoxConstraints c) => Positioned(
-    bottom: c.maxHeight * 0.1,
-    left: c.maxWidth * 0.08,
+    bottom: c.maxHeight * 0.09,
+    left: c.maxWidth * 0.04,
     child: CustomPaint(
-      size: Size(c.maxWidth * 0.12, c.maxHeight * 0.35),
+      size: Size(c.maxWidth * 0.13, c.maxHeight * 0.38),
       painter: _PlantPainter(),
     ),
   );
 
   Widget _buildSeaweed(BoxConstraints c) => Positioned(
-    bottom: c.maxHeight * 0.1,
-    left: c.maxWidth * 0.22,
+    bottom: c.maxHeight * 0.09,
+    left: c.maxWidth * 0.18,
     child: CustomPaint(
-      size: Size(c.maxWidth * 0.08, c.maxHeight * 0.3),
+      size: Size(c.maxWidth * 0.07, c.maxHeight * 0.32),
       painter: _SeaweedPainter(),
     ),
   );
 
   Widget _buildCoral(BoxConstraints c) => Positioned(
-    bottom: c.maxHeight * 0.1,
-    left: c.maxWidth * 0.42,
+    bottom: c.maxHeight * 0.09,
+    left: c.maxWidth * 0.38,
     child: CustomPaint(
-      size: Size(c.maxWidth * 0.18, c.maxHeight * 0.22),
+      size: Size(c.maxWidth * 0.16, c.maxHeight * 0.24),
       painter: _CoralPainter(),
     ),
   );
 
   Widget _buildRock(BoxConstraints c) => Positioned(
-    bottom: c.maxHeight * 0.1,
-    left: c.maxWidth * 0.58,
+    bottom: c.maxHeight * 0.09,
+    left: c.maxWidth * 0.27,
     child: CustomPaint(
-      size: Size(c.maxWidth * 0.16, c.maxHeight * 0.13),
+      size: Size(c.maxWidth * 0.14, c.maxHeight * 0.11),
       painter: _RockPainter(),
     ),
   );
 
   Widget _buildTunnel(BoxConstraints c) => Positioned(
-    bottom: c.maxHeight * 0.1,
-    left: c.maxWidth * 0.28,
+    bottom: c.maxHeight * 0.09,
+    left: c.maxWidth * 0.3,
     child: CustomPaint(
-      size: Size(c.maxWidth * 0.26, c.maxHeight * 0.19),
+      size: Size(c.maxWidth * 0.24, c.maxHeight * 0.18),
       painter: _TunnelPainter(),
     ),
   );
 
   Widget _buildCastle(BoxConstraints c) => Positioned(
-    bottom: c.maxHeight * 0.1,
-    right: c.maxWidth * 0.05,
+    bottom: c.maxHeight * 0.09,
+    right: c.maxWidth * 0.03,
     child: CustomPaint(
-      size: Size(c.maxWidth * 0.22, c.maxHeight * 0.3),
+      size: Size(c.maxWidth * 0.26, c.maxHeight * 0.32),
       painter: _CastlePainter(),
     ),
   );
 
   Widget _buildAnchor(BoxConstraints c) => Positioned(
-    bottom: c.maxHeight * 0.12,
-    right: c.maxWidth * 0.28,
+    bottom: c.maxHeight * 0.1,
+    right: c.maxWidth * 0.3,
     child: CustomPaint(
-      size: Size(c.maxWidth * 0.1, c.maxHeight * 0.2),
+      size: Size(c.maxWidth * 0.09, c.maxHeight * 0.18),
       painter: _AnchorPainter(),
     ),
   );
@@ -641,21 +643,22 @@ class _FishTankScreenState extends State<FishTankScreen>
   Widget _buildFish(Fish fish, BoxConstraints c) {
     final state = _fishStates[fish.id];
     if (state == null) return const SizedBox();
-    final fishW = c.maxWidth * 0.14;
-    final fishH = fishW * 0.55;
+    final fishW = c.maxWidth * 0.18;
+    final fishH = fishW * 0.62;
     final x = state.x * c.maxWidth - fishW / 2;
     final y = state.y * c.maxHeight - fishH / 2;
     return Positioned(
       left: x.clamp(0, c.maxWidth - fishW),
-      top: y.clamp(0, c.maxHeight * 0.8 - fishH),
+      top: y.clamp(0, c.maxHeight * 0.78 - fishH),
       child: Transform(
         alignment: Alignment.center,
-        transform: Matrix4.identity()
-          ..rotateY(state.facingRight ? 0 : pi)
-          ..rotateZ(state.wiggle),
-        child: CustomPaint(
-          size: Size(fishW, fishH),
-          painter: _FishPainter(color: Color(fish.colorValue), type: fish.type),
+        transform: Matrix4.identity()..rotateZ(state.wiggle),
+        child: FishWidget(
+          fishType: fish.type,
+          color: Color(fish.colorValue),
+          width: fishW,
+          height: fishH,
+          facingRight: state.facingRight,
         ),
       ),
     );
@@ -696,119 +699,66 @@ class _FishState {
 
 // ── Painters ──────────────────────────────────────────────────
 
-class _FishPainter extends CustomPainter {
-  final Color color;
-  final String type;
-  _FishPainter({required this.color, required this.type});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    // ลำตัว
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.15, h * 0.5)
-        ..quadraticBezierTo(w * 0.5, 0, w * 0.85, h * 0.5)
-        ..quadraticBezierTo(w * 0.5, h, w * 0.15, h * 0.5),
-      Paint()..color = color,
-    );
-
-    // หาง
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.15, h * 0.5)
-        ..lineTo(0, h * 0.15)
-        ..lineTo(0, h * 0.85)
-        ..close(),
-      Paint()..color = color.withOpacity(0.8),
-    );
-
-    // ลาย nemo
-    if (type == 'nemo') {
-      final p = Paint()
-        ..color = Colors.white.withOpacity(0.8)
-        ..strokeWidth = w * 0.06
-        ..style = PaintingStyle.stroke;
-      canvas.drawLine(
-        Offset(w * 0.45, h * 0.12),
-        Offset(w * 0.45, h * 0.88),
-        p,
-      );
-      canvas.drawLine(
-        Offset(w * 0.65, h * 0.18),
-        Offset(w * 0.65, h * 0.82),
-        p,
-      );
-    }
-
-    // ครีบ angel
-    if (type == 'angel') {
-      canvas.drawPath(
-        Path()
-          ..moveTo(w * 0.4, h * 0.1)
-          ..lineTo(w * 0.5, -h * 0.2)
-          ..lineTo(w * 0.7, h * 0.1)
-          ..close(),
-        Paint()..color = color.withOpacity(0.6),
-      );
-    }
-
-    // ตา
-    canvas.drawCircle(
-      Offset(w * 0.72, h * 0.38),
-      w * 0.065,
-      Paint()..color = Colors.white,
-    );
-    canvas.drawCircle(
-      Offset(w * 0.73, h * 0.38),
-      w * 0.035,
-      Paint()..color = Colors.black87,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_) => true;
-}
-
 class _PlantPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final s = size;
+    final stemPaint = Paint()
+      ..color = const Color(0xFF1A8A4A)
+      ..strokeWidth = s.width * 0.13
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    // ลำต้นหลัก
     canvas.drawLine(
-      Offset(s.width / 2, s.height),
-      Offset(s.width / 2, s.height * 0.3),
-      Paint()
-        ..color = const Color(0xFF2ECC71)
-        ..strokeWidth = s.width * 0.15
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round,
+      Offset(s.width * 0.5, s.height),
+      Offset(s.width * 0.5, s.height * 0.25),
+      stemPaint,
     );
-    canvas.drawPath(
-      Path()
-        ..moveTo(s.width / 2, s.height * 0.6)
-        ..quadraticBezierTo(0, s.height * 0.4, s.width * 0.1, s.height * 0.2),
-      Paint()
-        ..color = const Color(0xFF27AE60)
-        ..strokeWidth = s.width * 0.12
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round,
-    );
-    canvas.drawPath(
-      Path()
-        ..moveTo(s.width / 2, s.height * 0.45)
+    // ใบซ้าย 3 ใบ
+    for (int i = 0; i < 3; i++) {
+      final y = s.height * (0.75 - i * 0.2);
+      final leafPath = Path()
+        ..moveTo(s.width * 0.5, y)
         ..quadraticBezierTo(
-          s.width,
-          s.height * 0.25,
-          s.width * 0.9,
-          s.height * 0.05,
-        ),
-      Paint()
-        ..color = const Color(0xFF2ECC71)
-        ..strokeWidth = s.width * 0.12
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round,
+          s.width * 0.05,
+          y - s.height * 0.12,
+          s.width * 0.08,
+          y - s.height * 0.22,
+        );
+      canvas.drawPath(
+        leafPath,
+        Paint()
+          ..color = const Color(0xFF27AE60).withOpacity(0.9)
+          ..strokeWidth = s.width * 0.11
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+    // ใบขวา 2 ใบ
+    for (int i = 0; i < 2; i++) {
+      final y = s.height * (0.65 - i * 0.22);
+      final leafPath = Path()
+        ..moveTo(s.width * 0.5, y)
+        ..quadraticBezierTo(
+          s.width * 0.95,
+          y - s.height * 0.1,
+          s.width * 0.92,
+          y - s.height * 0.2,
+        );
+      canvas.drawPath(
+        leafPath,
+        Paint()
+          ..color = const Color(0xFF2ECC71)
+          ..strokeWidth = s.width * 0.1
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+    // ยอด
+    canvas.drawCircle(
+      Offset(s.width * 0.5, s.height * 0.22),
+      s.width * 0.12,
+      Paint()..color = const Color(0xFF58D68D),
     );
   }
 
@@ -849,25 +799,48 @@ class _CoralPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final paint = Paint()
-      ..color = const Color(0xFFE74C3C)
-      ..strokeWidth = w * 0.1
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawLine(Offset(w / 2, h), Offset(w / 2, h * 0.3), paint);
-    canvas.drawLine(Offset(w / 2, h * 0.65), Offset(w * 0.1, h * 0.25), paint);
-    canvas.drawLine(Offset(w / 2, h * 0.5), Offset(w * 0.9, h * 0.2), paint);
-    canvas.drawLine(Offset(w / 2, h * 0.4), Offset(w * 0.2, h * 0.05), paint);
-
-    final dot = Paint()..color = const Color(0xFFFF6B6B);
-    for (final o in [
-      Offset(w / 2, h * 0.28),
-      Offset(w * 0.08, h * 0.22),
-      Offset(w * 0.92, h * 0.17),
-      Offset(w * 0.18, h * 0.03),
-    ]) {
-      canvas.drawCircle(o, w * 0.09, dot);
+    // ก้าน gradient สีปะการัง
+    final stems = [
+      [w * 0.5, h, w * 0.5, h * 0.28],
+      [w * 0.5, h * 0.65, w * 0.08, h * 0.22],
+      [w * 0.5, h * 0.5, w * 0.92, h * 0.18],
+      [w * 0.5, h * 0.4, w * 0.18, h * 0.04],
+      [w * 0.5, h * 0.55, w * 0.72, h * 0.32],
+    ];
+    for (final s in stems) {
+      canvas.drawLine(
+        Offset(s[0], s[1]),
+        Offset(s[2], s[3]),
+        Paint()
+          ..shader =
+              LinearGradient(
+                colors: [const Color(0xFFE74C3C), const Color(0xFFFF8A80)],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+              ).createShader(
+                Rect.fromPoints(Offset(s[0], s[1]), Offset(s[2], s[3])),
+              )
+          ..strokeWidth = w * 0.09
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+    // ดอกปะการัง (วงกลมซ้อน)
+    final tips = [
+      Offset(w * 0.5, h * 0.26),
+      Offset(w * 0.07, h * 0.2),
+      Offset(w * 0.93, h * 0.16),
+      Offset(w * 0.17, h * 0.02),
+      Offset(w * 0.73, h * 0.3),
+    ];
+    for (final t in tips) {
+      canvas.drawCircle(t, w * 0.1, Paint()..color = const Color(0xFFFF5252));
+      canvas.drawCircle(t, w * 0.065, Paint()..color = const Color(0xFFFF8A80));
+      canvas.drawCircle(
+        t,
+        w * 0.035,
+        Paint()..color = Colors.white.withOpacity(0.6),
+      );
     }
   }
 
@@ -942,32 +915,95 @@ class _CastlePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final paint = Paint()..color = const Color(0xFFBDC3C7);
-    canvas.drawRect(Rect.fromLTWH(w * 0.1, h * 0.4, w * 0.8, h * 0.6), paint);
-    canvas.drawRect(Rect.fromLTWH(0, h * 0.2, w * 0.3, h * 0.5), paint);
-    canvas.drawRect(Rect.fromLTWH(w * 0.7, h * 0.2, w * 0.3, h * 0.5), paint);
-    canvas.drawPath(
-      Path()
-        ..moveTo(0, h * 0.2)
-        ..lineTo(w * 0.15, 0)
-        ..lineTo(w * 0.3, h * 0.2)
-        ..close(),
-      Paint()..color = const Color(0xFF95A5A6),
-    );
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.7, h * 0.2)
-        ..lineTo(w * 0.85, 0)
-        ..lineTo(w, h * 0.2)
-        ..close(),
-      Paint()..color = const Color(0xFF95A5A6),
-    );
+    final wall = Paint()..color = const Color(0xFFAAB7B8);
+    final shadow = Paint()..color = const Color(0xFF7F8C8D);
+    final highlight = Paint()..color = Colors.white.withOpacity(0.18);
+    // ฐานปราสาท
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(w * 0.35, h * 0.65, w * 0.3, h * 0.35),
-        Radius.circular(w * 0.15),
+        Rect.fromLTWH(w * 0.1, h * 0.38, w * 0.8, h * 0.62),
+        const Radius.circular(4),
       ),
-      Paint()..color = const Color(0xFF7F8C8D),
+      wall,
+    );
+    // หอซ้าย
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, h * 0.18, w * 0.3, h * 0.55),
+        const Radius.circular(3),
+      ),
+      wall,
+    );
+    // หอขวา
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.7, h * 0.18, w * 0.3, h * 0.55),
+        const Radius.circular(3),
+      ),
+      wall,
+    );
+    // หลังคาหอซ้าย (ยอดแหลม)
+    canvas.drawPath(
+      Path()
+        ..moveTo(0, h * 0.18)
+        ..lineTo(w * 0.15, 0)
+        ..lineTo(w * 0.3, h * 0.18)
+        ..close(),
+      shadow,
+    );
+    // หลังคาหอขวา
+    canvas.drawPath(
+      Path()
+        ..moveTo(w * 0.7, h * 0.18)
+        ..lineTo(w * 0.85, 0)
+        ..lineTo(w, h * 0.18)
+        ..close(),
+      shadow,
+    );
+    // เชิงเทิน (ฟันปลา) หอซ้าย
+    for (int i = 0; i < 3; i++) {
+      canvas.drawRect(
+        Rect.fromLTWH(w * 0.03 + i * w * 0.09, h * 0.14, w * 0.06, h * 0.07),
+        wall,
+      );
+    }
+    // เชิงเทิน หอขวา
+    for (int i = 0; i < 3; i++) {
+      canvas.drawRect(
+        Rect.fromLTWH(w * 0.73 + i * w * 0.09, h * 0.14, w * 0.06, h * 0.07),
+        wall,
+      );
+    }
+    // ประตูโค้ง
+    canvas.drawRRect(
+      RRect.fromRectAndCorners(
+        Rect.fromLTWH(w * 0.35, h * 0.62, w * 0.3, h * 0.38),
+        topLeft: Radius.circular(w * 0.15),
+        topRight: Radius.circular(w * 0.15),
+      ),
+      shadow,
+    );
+    // หน้าต่างเล็ก 2 ข้าง
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(w * 0.22, h * 0.52),
+        width: w * 0.12,
+        height: h * 0.1,
+      ),
+      shadow,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(w * 0.78, h * 0.52),
+        width: w * 0.12,
+        height: h * 0.1,
+      ),
+      shadow,
+    );
+    // highlight
+    canvas.drawRect(
+      Rect.fromLTWH(w * 0.12, h * 0.4, w * 0.08, h * 0.3),
+      highlight,
     );
   }
 
