@@ -116,7 +116,7 @@ class StoreScreen extends StatelessWidget {
                   : () => _confirmBuyCardTheme(context, provider, theme),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardTheme.color ?? Colors.white,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
                     color: isUnlocked
@@ -321,8 +321,8 @@ class StoreScreen extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   color: isUnlocked
-                      ? const Color(0xFFA3C9A8).withOpacity(0.12)
-                      : Colors.white,
+                      ? Theme.of(context).primaryColor.withOpacity(0.12)
+                      : Theme.of(context).cardTheme.color ?? Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: isUnlocked
@@ -453,8 +453,8 @@ class StoreScreen extends StatelessWidget {
             return Container(
               decoration: BoxDecoration(
                 color: isEquipped
-                    ? const Color(0xFFA3C9A8).withOpacity(0.15)
-                    : Colors.white,
+                    ? Theme.of(context).primaryColor.withOpacity(0.15)
+                    : Theme.of(context).cardTheme.color ?? Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isEquipped
@@ -772,8 +772,8 @@ class StoreScreen extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isOwned
-                      ? const Color(0xFFA3C9A8).withOpacity(0.15)
-                      : Colors.white,
+                      ? Theme.of(context).primaryColor.withOpacity(0.15)
+                      : Theme.of(context).cardTheme.color ?? Colors.white,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isOwned

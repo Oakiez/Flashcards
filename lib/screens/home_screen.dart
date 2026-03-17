@@ -30,9 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         height: MediaQuery.of(context).size.height * 0.92,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFFF9F0),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
@@ -474,11 +474,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Text(
               'Lv. ${user.level}',
-              style: const TextStyle(
-                color: null,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
           const SizedBox(width: 8),
@@ -500,16 +496,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 4),
                 Text(
                   '${user.coins}',
-                  style: const TextStyle(
-                    color: null,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.help_outline_rounded, color: null),
+            icon: Icon(
+              Icons.help_outline_rounded,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             tooltip: 'Tutorial',
             onPressed: () => _showTutorial(context),
           ),
@@ -534,7 +530,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).cardTheme.color ?? Colors.white,
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25),
@@ -829,12 +825,12 @@ class _TutorialContentState extends State<_TutorialContent> {
     return Column(
       children: [
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'คู่มือการใช้งาน 📖',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: null,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 16),
@@ -872,10 +868,10 @@ class _TutorialContentState extends State<_TutorialContent> {
                     const SizedBox(height: 24),
                     Text(
                       page['title'] as String,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: null,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -890,9 +886,9 @@ class _TutorialContentState extends State<_TutorialContent> {
                       ),
                       child: Text(
                         page['desc'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: null,
+                          color: Theme.of(context).colorScheme.onSurface,
                           height: 1.6,
                         ),
                       ),
@@ -916,8 +912,8 @@ class _TutorialContentState extends State<_TutorialContent> {
               width: _currentPage == i ? 24 : 8,
               decoration: BoxDecoration(
                 color: _currentPage == i
-                    ? const Color(0xFFA3C9A8)
-                    : Colors.grey[300],
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

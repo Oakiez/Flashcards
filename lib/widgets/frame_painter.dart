@@ -31,6 +31,15 @@ class FramePainter extends CustomPainter {
       case 'กรอบเปลวสี 🌈':
         _drawRainbowFrame(canvas, size, cx, cy, r);
         break;
+      case 'กรอบไม้ธรรมชาติ 🪵':
+        _drawWoodFrame(canvas, size, cx, cy, r);
+        break;
+      case 'กรอบทองคำขาว 💎':
+        _drawGoldFrame(canvas, size, cx, cy, r);
+        break;
+      case 'กรอบออร่าพาสเทล ✨':
+        _drawAuraFrame(canvas, size, cx, cy, r);
+        break;
       default:
         _drawDefaultFrame(canvas, size, cx, cy, r);
     }
@@ -331,6 +340,118 @@ class FramePainter extends CustomPainter {
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
     c.drawCircle(Offset(cx, cy), r - 12, inner);
+  }
+
+  // ── กรอบไม้ธรรมชาติ 🪵 ──
+  void _drawWoodFrame(Canvas c, Size s, double cx, double cy, double r) {
+    // วงหลัก สีไม้น้ำตาล gradient
+    final ring = Paint()
+      ..shader = SweepGradient(
+        colors: [
+          const Color(0xFF8B5E3C),
+          const Color(0xFFD4A96A),
+          const Color(0xFF6B3A2A),
+          const Color(0xFFB87333),
+          const Color(0xFF8B5E3C),
+        ],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r))
+      ..strokeWidth = 11
+      ..style = PaintingStyle.stroke;
+    c.drawCircle(Offset(cx, cy), r, ring);
+
+    // เส้นลายไม้ (เส้นเล็กๆ รอบขอบ)
+    final grain = Paint()
+      ..color = const Color(0xFF6B3A2A).withOpacity(0.5)
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+    c.drawCircle(Offset(cx, cy), r - 5, grain);
+    c.drawCircle(Offset(cx, cy), r + 4, grain);
+  }
+
+  // ── กรอบทองคำขาว 💎 ──
+  void _drawGoldFrame(Canvas c, Size s, double cx, double cy, double r) {
+    // วงนอก สีทอง
+    final outer = Paint()
+      ..shader = SweepGradient(
+        colors: [
+          const Color(0xFFFFD700),
+          const Color(0xFFFFF8DC),
+          const Color(0xFFDAA520),
+          const Color(0xFFFFF8DC),
+          const Color(0xFFFFD700),
+        ],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r))
+      ..strokeWidth = 5
+      ..style = PaintingStyle.stroke;
+    c.drawCircle(Offset(cx, cy), r, outer);
+
+    // วงกลาง สีขาวเงิน
+    final mid = Paint()
+      ..shader = SweepGradient(
+        colors: [
+          Colors.white,
+          Colors.grey.shade300,
+          Colors.white,
+          Colors.grey.shade200,
+          Colors.white,
+        ],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r - 6))
+      ..strokeWidth = 5
+      ..style = PaintingStyle.stroke;
+    c.drawCircle(Offset(cx, cy), r - 6, mid);
+
+    // จุดทองตกแต่งรอบวง
+    final dot = Paint()..color = const Color(0xFFFFD700);
+    const count = 16;
+    for (int i = 0; i < count; i++) {
+      final a = (i / count) * 2 * 3.14159;
+      final dx = cx + (r - 2) * cos(a);
+      final dy = cy + (r - 2) * sin(a);
+      c.drawCircle(Offset(dx, dy), i % 2 == 0 ? 3 : 1.5, dot);
+    }
+  }
+
+  // ── กรอบออร่าพาสเทล ✨ ──
+  void _drawAuraFrame(Canvas c, Size s, double cx, double cy, double r) {
+    // วงนอก rainbow pastel
+    final outer = Paint()
+      ..shader = SweepGradient(
+        colors: [
+          Colors.purple.shade200,
+          Colors.pink.shade200,
+          Colors.blue.shade200,
+          Colors.green.shade200,
+          Colors.yellow.shade200,
+          Colors.purple.shade200,
+        ],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r))
+      ..strokeWidth = 8
+      ..style = PaintingStyle.stroke;
+    c.drawCircle(Offset(cx, cy), r, outer);
+
+    // วงในเส้นเล็กสีอ่อน
+    final inner = Paint()
+      ..shader = SweepGradient(
+        colors: [
+          Colors.pink.shade100,
+          Colors.purple.shade100,
+          Colors.blue.shade100,
+          Colors.pink.shade100,
+        ],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r - 10))
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+    c.drawCircle(Offset(cx, cy), r - 10, inner);
+
+    // จุดประกายรอบวง
+    final sparkPaint = Paint()..color = Colors.white.withOpacity(0.9);
+    const count = 12;
+    for (int i = 0; i < count; i++) {
+      final a = (i / count) * 2 * 3.14159;
+      final dx = cx + (r - 1) * cos(a);
+      final dy = cy + (r - 1) * sin(a);
+      c.drawCircle(Offset(dx, dy), i % 3 == 0 ? 3 : 1.5, sparkPaint);
+    }
   }
 
   @override

@@ -119,10 +119,10 @@ class _TutorialScreenState extends State<TutorialScreen> {
                         Text(
                           page['title'] as String,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF4A4A4A),
+                            color: Theme.of(context).colorScheme.onSurface,
                             height: 1.3,
                           ),
                         ),
@@ -141,9 +141,9 @@ class _TutorialScreenState extends State<TutorialScreen> {
                           child: Text(
                             page['desc'] as String,
                             textAlign: TextAlign.left,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
-                              color: Color(0xFF4A4A4A),
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.6,
                             ),
                           ),
@@ -168,7 +168,9 @@ class _TutorialScreenState extends State<TutorialScreen> {
                   decoration: BoxDecoration(
                     color: _currentPage == i
                         ? const Color(0xFFA3C9A8)
-                        : Colors.grey[300],
+                        : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
