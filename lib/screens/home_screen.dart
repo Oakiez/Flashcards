@@ -55,6 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showCreateDeckModal(BuildContext context, DeckProvider deckProvider) {
     final titleCtrl = TextEditingController();
+    String selectedIcon = 'default';
+    String selectedTheme = 'default';
 
     showModalBottomSheet(
       context: context,
@@ -62,88 +64,290 @@ class _HomeScreenState extends State<HomeScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          left: 20,
-          right: 20,
-          top: 20,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'สร้างสำรับใหม่ ✨',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              // hint: สีสำรับมาจาก theme
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModal) => DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.85,
+          maxChildSize: 0.95,
+          builder: (_, scrollCtrl) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom,
+              left: 20,
+              right: 20,
+              top: 20,
+            ),
+            child: ListView(
+              controller: scrollCtrl,
+              children: [
+                // Handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFA3C9A8).withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
+                const Text(
+                  'สร้างสำรับใหม่ ✨',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                child: const Row(
-                  children: [
-                    Text('🎨', style: TextStyle(fontSize: 14)),
-                    SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        'สีสำรับจะตามธีมการ์ดที่เลือก\nตั้งค่าได้ในหน้า "ปรับแต่งสำรับ"',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                const SizedBox(height: 16),
+
+                // ── ชื่อสำรับ ──────────────────────────────
+                TextField(
+                  controller: titleCtrl,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    labelText: 'ชื่อสำรับ',
+                    hintText: 'เช่น ภาษาอังกฤษ, คณิตศาสตร์',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // ── ไอคอนสำรับ ─────────────────────────────
+                const Text(
+                  'ไอคอนสำรับ',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: DeckProvider.deckIconCatalog.map((icon) {
+                    final isUnlocked = deckProvider.user.unlockedDeckIcons
+                        .contains(icon['id']);
+                    final isSelected = selectedIcon == icon['id'];
+                    return GestureDetector(
+                      onTap: () {
+                        if (isUnlocked) {
+                          setModal(() => selectedIcon = icon['id'] as String);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'ยังไม่ได้ปลดล็อก — ไปซื้อในร้านค้าก่อนนะ 🛍️',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Theme.of(context).primaryColor.withOpacity(0.15)
+                              : Theme.of(context).cardTheme.color ??
+                                    Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey.withOpacity(0.25),
+                            width: isSelected ? 2.5 : 1,
+                          ),
+                        ),
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Text(
+                                icon['emoji'] as String,
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  color: isUnlocked
+                                      ? null
+                                      : Colors.black.withOpacity(0.2),
+                                ),
+                              ),
+                            ),
+                            if (!isUnlocked)
+                              Positioned(
+                                bottom: 2,
+                                right: 2,
+                                child: Icon(
+                                  Icons.lock,
+                                  size: 10,
+                                  color: Colors.grey[400],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+
+                // ── ธีมการ์ด ────────────────────────────────
+                const Text(
+                  'ธีมการ์ด',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: DeckProvider.cardThemeCatalog.map((theme) {
+                    final isUnlocked = deckProvider.user.unlockedCardThemes
+                        .contains(theme['id']);
+                    final isSelected = selectedTheme == theme['id'];
+                    final accentColor = Color(theme['accentColor'] as int);
+                    final frontColor = Color(theme['frontColor'] as int);
+                    final backColor = Color(theme['backColor'] as int);
+                    return GestureDetector(
+                      onTap: () {
+                        if (isUnlocked) {
+                          setModal(() => selectedTheme = theme['id'] as String);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'ยังไม่ได้ปลดล็อกธีมนี้ — ไปซื้อในร้านค้าก่อนนะ 🛍️',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        width: 72,
+                        height: 54,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: isSelected
+                              ? Border.all(color: accentColor, width: 3)
+                              : Border.all(color: Colors.grey.withOpacity(0.2)),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: accentColor.withOpacity(0.35),
+                                    blurRadius: 8,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 72,
+                                height: 54,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomPaint(
+                                        painter: CardThemePainter(
+                                          themeId: theme['id'] as String,
+                                          bg: backColor,
+                                          accent: accentColor,
+                                          isBack: true,
+                                        ),
+                                        child: const SizedBox.expand(),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: CustomPaint(
+                                        painter: CardThemePainter(
+                                          themeId: theme['id'] as String,
+                                          bg: frontColor,
+                                          accent: accentColor,
+                                          isBack: false,
+                                        ),
+                                        child: const SizedBox.expand(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            if (!isUnlocked)
+                              Positioned(
+                                bottom: 2,
+                                right: 2,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.black54,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.lock,
+                                    size: 9,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            if (isSelected)
+                              Positioned(
+                                top: 2,
+                                right: 2,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.check,
+                                    size: 9,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 24),
+
+                // ── ปุ่มสร้าง ───────────────────────────────
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              TextField(
-                controller: titleCtrl,
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: 'ชื่อสำรับ',
-                  hintText: 'เช่น ภาษาอังกฤษ, คณิตศาสตร์',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFA3C9A8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  onPressed: () {
-                    final name = titleCtrl.text.trim();
-                    deckProvider.addDeck(name.isEmpty ? 'สำรับใหม่ 🌟' : name);
-                    Navigator.pop(ctx);
-                  },
-                  child: const Text(
-                    'สร้างสำรับ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    onPressed: () {
+                      final name = titleCtrl.text.trim();
+                      final deckId = deckProvider.addDeck(
+                        name.isEmpty ? 'สำรับใหม่ 🌟' : name,
+                      );
+                      if (selectedIcon != 'default') {
+                        deckProvider.applyDeckIcon(deckId, selectedIcon);
+                      }
+                      if (selectedTheme != 'default') {
+                        deckProvider.applyCardTheme(deckId, selectedTheme);
+                      }
+                      Navigator.pop(ctx);
+                    },
+                    child: const Text(
+                      'สร้างสำรับ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),
@@ -347,90 +551,54 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 80,
                           height: 60,
                           decoration: BoxDecoration(
+                            color: frontColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: isSelected
-                                ? Border.all(color: accentColor, width: 3)
-                                : Border.all(
-                                    color: Colors.grey.withOpacity(0.2),
-                                  ),
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: accentColor.withOpacity(0.35),
-                                      blurRadius: 8,
-                                    ),
-                                  ]
-                                : null,
+                            border: Border.all(
+                              color: isSelected
+                                  ? accentColor
+                                  : Colors.grey.withOpacity(0.3),
+                              width: isSelected ? 2.5 : 1,
+                            ),
                           ),
                           child: Stack(
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: SizedBox(
-                                  width: 80,
-                                  height: 60,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: CustomPaint(
-                                          painter: CardThemePainter(
-                                            themeId: theme['id'] as String,
-                                            bg: Color(
-                                              theme['backColor'] as int,
-                                            ),
-                                            accent: accentColor,
-                                            isBack: true,
-                                          ),
-                                          child: const SizedBox.expand(),
-                                        ),
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      theme['emoji'] as String,
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                    Text(
+                                      theme['name'] as String,
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        color: accentColor,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      Expanded(
-                                        child: CustomPaint(
-                                          painter: CardThemePainter(
-                                            themeId: theme['id'] as String,
-                                            bg: frontColor,
-                                            accent: accentColor,
-                                            isBack: false,
-                                          ),
-                                          child: const SizedBox.expand(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               if (!isUnlocked)
                                 Positioned(
                                   bottom: 2,
-                                  right: 3,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(2),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.black54,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.lock,
-                                      size: 9,
-                                      color: Colors.white,
-                                    ),
+                                  right: 4,
+                                  child: Icon(
+                                    Icons.lock,
+                                    size: 12,
+                                    color: Colors.grey[400],
                                   ),
                                 ),
                               if (isSelected)
                                 Positioned(
-                                  top: 3,
-                                  right: 3,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(2),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.check,
-                                      size: 9,
-                                      color: Colors.green,
-                                    ),
+                                  top: 4,
+                                  right: 4,
+                                  child: Icon(
+                                    Icons.check_circle,
+                                    size: 14,
+                                    color: accentColor,
                                   ),
                                 ),
                             ],

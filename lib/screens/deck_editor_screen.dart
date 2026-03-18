@@ -1353,7 +1353,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
   void _tryPlay(BuildContext context, Deck deck) {
     if (deck.cards.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ต้องเพิ่มการ์ดอย่างน้อย 1 ใบก่อน! 🌟')),
+        const SnackBar(content: Text('ต้องเพิ่มการ์ดอย่างน้อย 10 ใบก่อน! 🌟')),
       );
       return;
     }

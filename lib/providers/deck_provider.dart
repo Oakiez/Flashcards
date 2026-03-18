@@ -797,17 +797,14 @@ class DeckProvider with ChangeNotifier {
 
   // ── Deck Management ───────────────────────────────────────────
 
-  void addDeck(String title, {String? imagePath}) {
+  String addDeck(String title, {String? imagePath}) {
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
     _decks.add(
-      Deck(
-        id: DateTime.now().toString(),
-        title: title,
-        cards: [],
-        backgroundImagePath: imagePath,
-      ),
+      Deck(id: id, title: title, cards: [], backgroundImagePath: imagePath),
     );
     _saveData();
     notifyListeners();
+    return id;
   }
 
   void deleteCard(String deckId, String cardId) {
