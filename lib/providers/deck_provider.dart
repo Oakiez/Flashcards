@@ -879,12 +879,42 @@ class DeckProvider with ChangeNotifier {
   }
 
   Future<void> resetAllData() async {
+    // ── 1. reset in-memory state ──────────────────────────────
     _decks = [];
     fishTank = FishTank();
-    user = UserProfile(name: 'นักเรียนใหม่ 🌱', level: 1, coins: 0, exp: 0);
     fishDiedFromHunger = false;
+    user = UserProfile(
+      name: 'นักเรียนใหม่ 🌱',
+      level: 1,
+      exp: 0,
+      coins: 0,
+      streak: 0,
+      lastPlayedDate: null,
+      selectedFrame: null,
+      unlockedFrames: [],
+      unlockedCardThemes: ['default'],
+      unlockedDeckIcons: ['default'],
+      selectedTitle: null,
+      unlockedTitles: [],
+    );
+
+    // ── 2. reset AudioService ─────────────────────────────────
+    await AudioService.instance.setMasterVolume(1.0);
+    await AudioService.instance.setMusicVolume(0.5);
+    if (AudioService.instance.masterMuted) {
+      await AudioService.instance.toggleMasterMute();
+    }
+    if (AudioService.instance.musicMuted) {
+      await AudioService.instance.toggleMusicMute();
+    }
+
+    // ── 3. ล้าง SharedPreferences ทั้งหมด ────────────────────
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+
+    // ── 4. set isFirstRun = true เพื่อให้ tutorial แสดงใหม่ ──
+    await prefs.setBool('isFirstRun', true);
+
     notifyListeners();
   }
 }
