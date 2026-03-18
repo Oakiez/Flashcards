@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/deck_provider.dart';
 import 'deck_editor_screen.dart';
 import '../services/audio_service.dart';
+import '../widgets/card_theme_painter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,9 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         height: MediaQuery.of(context).size.height * 0.92,
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFF9F0),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
@@ -346,54 +347,90 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 80,
                           height: 60,
                           decoration: BoxDecoration(
-                            color: frontColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected
-                                  ? accentColor
-                                  : Colors.grey.withOpacity(0.3),
-                              width: isSelected ? 2.5 : 1,
-                            ),
+                            border: isSelected
+                                ? Border.all(color: accentColor, width: 3)
+                                : Border.all(
+                                    color: Colors.grey.withOpacity(0.2),
+                                  ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: accentColor.withOpacity(0.35),
+                                      blurRadius: 8,
+                                    ),
+                                  ]
+                                : null,
                           ),
                           child: Stack(
                             children: [
-                              Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      theme['emoji'] as String,
-                                      style: const TextStyle(fontSize: 20),
-                                    ),
-                                    Text(
-                                      theme['name'] as String,
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        color: accentColor,
-                                        fontWeight: FontWeight.bold,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: SizedBox(
+                                  width: 80,
+                                  height: 60,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: CustomPaint(
+                                          painter: CardThemePainter(
+                                            themeId: theme['id'] as String,
+                                            bg: Color(
+                                              theme['backColor'] as int,
+                                            ),
+                                            accent: accentColor,
+                                            isBack: true,
+                                          ),
+                                          child: const SizedBox.expand(),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      Expanded(
+                                        child: CustomPaint(
+                                          painter: CardThemePainter(
+                                            themeId: theme['id'] as String,
+                                            bg: frontColor,
+                                            accent: accentColor,
+                                            isBack: false,
+                                          ),
+                                          child: const SizedBox.expand(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                               if (!isUnlocked)
                                 Positioned(
                                   bottom: 2,
-                                  right: 4,
-                                  child: Icon(
-                                    Icons.lock,
-                                    size: 12,
-                                    color: Colors.grey[400],
+                                  right: 3,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black54,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.lock,
+                                      size: 9,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               if (isSelected)
                                 Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: Icon(
-                                    Icons.check_circle,
-                                    size: 14,
-                                    color: accentColor,
+                                  top: 3,
+                                  right: 3,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.check,
+                                      size: 9,
+                                      color: Colors.green,
+                                    ),
                                   ),
                                 ),
                             ],
@@ -474,7 +511,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Text(
               'Lv. ${user.level}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: const TextStyle(
+                color: null,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -496,16 +537,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 4),
                 Text(
                   '${user.coins}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: null,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: Icon(
-              Icons.help_outline_rounded,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+            icon: const Icon(Icons.help_outline_rounded, color: null),
             tooltip: 'Tutorial',
             onPressed: () => _showTutorial(context),
           ),
@@ -530,7 +571,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Theme.of(context).cardTheme.color ?? Colors.white,
+                fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25),
@@ -825,12 +866,12 @@ class _TutorialContentState extends State<_TutorialContent> {
     return Column(
       children: [
         const SizedBox(height: 8),
-        Text(
+        const Text(
           'คู่มือการใช้งาน 📖',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
+            color: null,
           ),
         ),
         const SizedBox(height: 16),
@@ -868,10 +909,10 @@ class _TutorialContentState extends State<_TutorialContent> {
                     const SizedBox(height: 24),
                     Text(
                       page['title'] as String,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: null,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -886,9 +927,9 @@ class _TutorialContentState extends State<_TutorialContent> {
                       ),
                       child: Text(
                         page['desc'] as String,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: null,
                           height: 1.6,
                         ),
                       ),
@@ -912,8 +953,8 @@ class _TutorialContentState extends State<_TutorialContent> {
               width: _currentPage == i ? 24 : 8,
               decoration: BoxDecoration(
                 color: _currentPage == i
-                    ? Theme.of(context).primaryColor
-                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                    ? const Color(0xFFA3C9A8)
+                    : Colors.grey[300],
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

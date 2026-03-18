@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/deck_provider.dart';
 import '../services/audio_service.dart';
 import '../widgets/frame_painter.dart';
-import '../widgets/fish_painter.dart';
+import '../widgets/card_theme_painter.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
@@ -117,7 +117,7 @@ class StoreScreen extends StatelessWidget {
                   : () => _confirmBuyCardTheme(context, provider, theme),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardTheme.color ?? Colors.white,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
                     color: isUnlocked
@@ -146,6 +146,7 @@ class StoreScreen extends StatelessWidget {
                               backColor,
                               accentColor,
                               isBack: true,
+                              themeId: theme['id'] as String,
                             ),
                           ),
                           Positioned(
@@ -154,6 +155,7 @@ class StoreScreen extends StatelessWidget {
                               frontColor,
                               accentColor,
                               isBack: false,
+                              themeId: theme['id'] as String,
                             ),
                           ),
                         ],
@@ -217,26 +219,31 @@ class StoreScreen extends StatelessWidget {
     );
   }
 
-  Widget _miniCard(Color bg, Color accent, {required bool isBack}) {
+  Widget _miniCard(
+    Color bg,
+    Color accent, {
+    required bool isBack,
+    String themeId = 'default',
+  }) {
     return Container(
       width: 54,
       height: 70,
       decoration: BoxDecoration(
-        color: bg,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: accent.withOpacity(0.4), width: 1.5),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
-      child: Center(
-        child: Text(
-          isBack ? 'A' : '?',
-          style: TextStyle(
-            color: accent,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+      child: CustomPaint(
+        painter: CardThemePainter(
+          themeId: themeId,
+          bg: bg,
+          accent: accent,
+          isBack: isBack,
         ),
       ),
     );
@@ -323,7 +330,7 @@ class StoreScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isUnlocked
                       ? const Color(0xFFA3C9A8).withOpacity(0.12)
-                      : Theme.of(context).cardTheme.color ?? Colors.white,
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: isUnlocked
@@ -455,7 +462,7 @@ class StoreScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isEquipped
                     ? const Color(0xFFA3C9A8).withOpacity(0.15)
-                    : Theme.of(context).cardTheme.color ?? Colors.white,
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isEquipped
@@ -698,7 +705,7 @@ class StoreScreen extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 1.1,
+          childAspectRatio: 1.5,
           children: DeckProvider.fishCatalog.map((fish) {
             final owned = tank.fishes
                 .where((f) => f.type == fish['type'])
@@ -774,7 +781,7 @@ class StoreScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isOwned
                       ? const Color(0xFFA3C9A8).withOpacity(0.15)
-                      : Theme.of(context).cardTheme.color ?? Colors.white,
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isOwned
@@ -831,36 +838,52 @@ class StoreScreen extends StatelessWidget {
   }) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () =>
-            _showBuyFishDialog(context, provider, type, name, color, price),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FishWidget(fishType: type, color: color, width: 90, height: 56),
-              const SizedBox(height: 6),
-              Text(
-                name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              const SizedBox(height: 4),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'มี $owned ตัว',
-                    style: const TextStyle(color: Colors.grey, fontSize: 10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 28,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  Container(
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'มี $owned ตัว',
+                  style: const TextStyle(color: Colors.grey, fontSize: 10),
+                ),
+                GestureDetector(
+                  onTap: () => _showBuyFishDialog(
+                    context,
+                    provider,
+                    type,
+                    name,
+                    color,
+                    price,
+                  ),
+                  child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
                       vertical: 3,
@@ -878,10 +901,10 @@ class StoreScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -950,15 +973,18 @@ class StoreScreen extends StatelessWidget {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Column(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FishWidget(
-                      fishType: type,
-                      color: color,
-                      width: 110,
-                      height: 68,
+                    Container(
+                      width: 40,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(width: 8),
                     Text(
                       name,
                       style: const TextStyle(fontWeight: FontWeight.bold),

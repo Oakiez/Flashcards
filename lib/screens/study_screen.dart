@@ -7,6 +7,7 @@ import '../providers/deck_provider.dart';
 import '../models/deck_model.dart';
 import '../services/audio_service.dart';
 import 'result_screen.dart';
+import '../widgets/card_theme_painter.dart';
 
 class StudyScreen extends StatefulWidget {
   final String deckId;
@@ -222,123 +223,165 @@ class _StudyScreenState extends State<StudyScreen> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     width: double.infinity,
-                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      // 🆕 ใช้สี front/back จาก theme
                       color: _isFlipped ? colors['back'] : colors['front'],
                       borderRadius: BorderRadius.circular(20),
-                      // 🆕 เส้นขอบสีตาม theme
                       border: Border.all(
                         color: colors['accent']!.withOpacity(0.3),
                         width: 1.5,
                       ),
                     ),
                     child: Stack(
+                      fit: StackFit.expand,
                       children: [
-                        // 🆕 Theme emoji ตกแต่งมุมบนขวา (ถ้าไม่ใช่ default)
-                        if (emoji.isNotEmpty)
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Text(
-                              emoji,
-                              style: const TextStyle(fontSize: 24),
+                        // pattern background
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: CustomPaint(
+                            painter: CardThemePainter(
+                              themeId: _deck.cardTheme,
+                              bg: _isFlipped
+                                  ? colors['back']!
+                                  : colors['front']!,
+                              accent: colors['accent']!,
+                              isBack: _isFlipped,
                             ),
+                            child: const SizedBox.expand(),
                           ),
-
+                        ),
                         // เนื้อหาการ์ด
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Label ด้านหน้า/หลัง — จัดกึ่งกลาง
-                            Center(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colors['accent']!.withOpacity(0.13),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: colors['accent']!.withOpacity(0.25),
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Stack(
+                            children: [
+                              // 🆕 Theme emoji ตกแต่งมุมบนขวา (ถ้าไม่ใช่ default)
+                              if (emoji.isNotEmpty)
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: Text(
+                                    emoji,
+                                    style: const TextStyle(fontSize: 24),
                                   ),
                                 ),
-                                child: Text(
-                                  _isFlipped
-                                      ? 'ด้านหลัง (คำตอบ)'
-                                      : 'ด้านหน้า (คำถาม)',
-                                  style: TextStyle(
-                                    color: colors['accent'],
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
 
-                            // รูปภาพ
-                            if (!_isFlipped && card.frontImagePath != null)
-                              Expanded(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.file(
-                                    File(card.frontImagePath!),
-                                    fit: BoxFit.contain,
+                              // เนื้อหาการ์ด
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // Label ด้านหน้า/หลัง — จัดกึ่งกลาง
+                                  Center(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: colors['accent']!.withOpacity(
+                                          0.13,
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: colors['accent']!.withOpacity(
+                                            0.25,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        _isFlipped
+                                            ? 'ด้านหลัง (คำตอบ)'
+                                            : 'ด้านหน้า (คำถาม)',
+                                        style: TextStyle(
+                                          color: colors['accent'],
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            if (_isFlipped && card.backImagePath != null)
-                              Expanded(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.file(
-                                    File(card.backImagePath!),
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
+                                  const SizedBox(height: 24),
 
-                            if (card.frontImagePath != null ||
-                                card.backImagePath != null)
-                              const SizedBox(height: 16),
+                                  // รูปภาพ — จำกัดความสูงให้ไม่ทับ text
+                                  if (!_isFlipped &&
+                                      card.frontImagePath != null)
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxHeight:
+                                            MediaQuery.of(context).size.height *
+                                            0.28,
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.file(
+                                          File(card.frontImagePath!),
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  if (_isFlipped && card.backImagePath != null)
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxHeight:
+                                            MediaQuery.of(context).size.height *
+                                            0.28,
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.file(
+                                          File(card.backImagePath!),
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
 
-                            // กล่องข้อความ contrast — โดดเด่นออกมาจากพื้นหลัง
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 18,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colors['accent']!.withOpacity(0.10),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: colors['accent']!.withOpacity(0.22),
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: colors['accent']!.withOpacity(0.07),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
+                                  if (card.frontImagePath != null ||
+                                      card.backImagePath != null)
+                                    const SizedBox(height: 16),
+
+                                  // กล่องข้อความ contrast — โดดเด่นออกมาจากพื้นหลัง
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 18,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: colors['accent']!.withOpacity(
+                                        0.10,
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: colors['accent']!.withOpacity(
+                                          0.22,
+                                        ),
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: colors['accent']!.withOpacity(
+                                            0.07,
+                                          ),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      _isFlipped ? card.back : card.front,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold,
+                                        color: colors['accent'],
+                                        height: 1.3,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              child: Text(
-                                _isFlipped ? card.back : card.front,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: colors['accent'],
-                                  height: 1.3,
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
