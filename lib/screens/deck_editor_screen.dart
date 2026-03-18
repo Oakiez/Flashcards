@@ -178,7 +178,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
     );
   }
 
-  // ── ตั้งค่าสำรับ — ลบ color picker ออกแล้ว (สีมาจาก cardTheme) ────────────
+  // ── ตั้งค่าสำรับ ────────────
   void _showDeckSettingsModal(BuildContext context, Deck deck) {
     final titleController = TextEditingController(text: deck.title);
     String? selectedImagePath = deck.backgroundImagePath;
@@ -227,43 +227,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: OutlinedButton.icon(
-                //         icon: const Icon(Icons.image_outlined),
-                //         label: Text(
-                //           selectedImagePath != null
-                //               ? 'เปลี่ยนรูปพื้นหลัง'
-                //               : 'เลือกรูปพื้นหลัง',
-                //         ),
-                //         style: OutlinedButton.styleFrom(
-                //           padding: const EdgeInsets.symmetric(vertical: 12),
-                //           shape: RoundedRectangleBorder(
-                //             borderRadius: BorderRadius.circular(12),
-                //           ),
-                //         ),
-                //         onPressed: () async {
-                //           final path = await _pickImage();
-                //           if (path != null)
-                //             setStateModal(() => selectedImagePath = path);
-                //         },
-                //       ),
-                //     ),
-                //     if (selectedImagePath != null) ...[
-                //       const SizedBox(width: 8),
-                //       IconButton(
-                //         icon: const Icon(
-                //           Icons.delete_outline,
-                //           color: Colors.redAccent,
-                //         ),
-                //         onPressed: () =>
-                //             setStateModal(() => selectedImagePath = null),
-                //       ),
-                //     ],
-                //   ],
-                // ),
+
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
@@ -1002,18 +966,14 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
     final allSelected =
         deck.cards.isNotEmpty && _selectedIds.length == deck.cards.length;
 
-    // 🆕 deckColor = accent color ของ theme สำรับ
     final deckColor = Color(deck.colorValue);
-    // 🆕 ใช้สี bg จาก app theme แทนการทำ AppBar เป็นสีสำรับ
     final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
     final textColor = Theme.of(context).colorScheme.onSurface;
     final cardBg = Theme.of(context).cardTheme.color ?? Colors.white;
 
     return Scaffold(
       appBar: AppBar(
-        // 🆕 พื้นหลัง AppBar ใช้สี scaffold เดิม ไม่ใช้สีสำรับ
         backgroundColor: scaffoldBg,
-        // 🆕 ชื่อสำรับใช้สี deckColor เพื่อให้โดดเด่นและเป็นตัวบ่งบอก theme
         title: _selectMode
             ? Text(
                 'เลือกแล้ว ${_selectedIds.length} ใบ',
@@ -1111,7 +1071,6 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
 
       body: Column(
         children: [
-          // 🆕 Header แถบสรุป — ใช้ deckColor เป็นแค่ accent บน bg ปกติ
           Container(
             color: deckColor.withOpacity(0.12),
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 14),
@@ -1142,7 +1101,6 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                     ),
                   ],
                 ),
-                // 🆕 badge จำได้ใช้ deckColor border
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -1353,7 +1311,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
   void _tryPlay(BuildContext context, Deck deck) {
     if (deck.cards.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ต้องเพิ่มการ์ดอย่างน้อย 10 ใบก่อน! 🌟')),
+        const SnackBar(content: Text('ต้องเพิ่มการ์ดถึงจะเล่นได้นะ! 🌟')),
       );
       return;
     }

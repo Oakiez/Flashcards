@@ -5,8 +5,16 @@ class AudioService {
   static final AudioService instance = AudioService._();
   AudioService._();
 
-  final AudioPlayer _sfxPlayer = AudioPlayer();
+  // ── BGM ──────────────────────────────────
   final AudioPlayer _musicPlayer = AudioPlayer();
+
+  // ── SFX ──────────────────────
+  final AudioPlayer _sfxClick = AudioPlayer();
+  final AudioPlayer _sfxFlip = AudioPlayer();
+  final AudioPlayer _sfxCorrect = AudioPlayer();
+  final AudioPlayer _sfxWrong = AudioPlayer();
+  final AudioPlayer _sfxLevelUp = AudioPlayer();
+  final AudioPlayer _sfxPurchase = AudioPlayer();
 
   double _masterVolume = 1.0;
   double _musicVolume = 0.5;
@@ -18,7 +26,20 @@ class AudioService {
   bool get masterMuted => _masterMuted;
   bool get musicMuted => _musicMuted;
 
-  // ── Load Settings ─────────────────────────────────
+  double get _sfxVol => _masterMuted ? 0.0 : _masterVolume;
+  double get _bgmVol =>
+      (_masterMuted || _musicMuted) ? 0.0 : _masterVolume * _musicVolume;
+
+  List<AudioPlayer> get _sfxPlayers => [
+    _sfxClick,
+    _sfxFlip,
+    _sfxCorrect,
+    _sfxWrong,
+    _sfxLevelUp,
+    _sfxPurchase,
+  ];
+
+  // ── Init ───────────────────────────────────────────────────────
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     _masterVolume = prefs.getDouble('masterVolume') ?? 1.0;
@@ -26,86 +47,101 @@ class AudioService {
     _masterMuted = prefs.getBool('masterMuted') ?? false;
     _musicMuted = prefs.getBool('musicMuted') ?? false;
 
-    _sfxPlayer.setVolume(_sfxVolume);
-    _musicPlayer.setVolume(_bgmVolume);
+    for (final p in _sfxPlayers) {
+      await p.setReleaseMode(ReleaseMode.stop);
+      await p.setAudioContext(
+        AudioContext(
+          android: AudioContextAndroid(
+            isSpeakerphoneOn: false,
+            stayAwake: false,
+            contentType: AndroidContentType.music,
+            usageType: AndroidUsageType.media,
+            audioFocus: AndroidAudioFocus.none,
+          ),
+        ),
+      );
+    }
+
+    await _musicPlayer.setAudioContext(
+      AudioContext(
+        android: AudioContextAndroid(
+          isSpeakerphoneOn: false,
+          stayAwake: true,
+          contentType: AndroidContentType.music,
+          usageType: AndroidUsageType.media,
+          audioFocus: AndroidAudioFocus.gain,
+        ),
+      ),
+    );
+    await _musicPlayer.setReleaseMode(ReleaseMode.loop);
 
     await startBgm();
   }
 
-  double get _sfxVolume => _masterMuted ? 0 : _masterVolume;
-  double get _bgmVolume =>
-      (_masterMuted || _musicMuted) ? 0 : _masterVolume * _musicVolume;
+  // ── SFX ───────────────────────────────────────────────────────
+  Future<void> playBtnClick() => _playSfx(_sfxClick, 'btn_click.mp3');
+  Future<void> playCardFlip() => _playSfx(_sfxFlip, 'card_flip.mp3');
+  Future<void> playCorrect() => _playSfx(_sfxCorrect, 'correct.mp3');
+  Future<void> playWrong() => _playSfx(_sfxWrong, 'wrong.mp3');
+  Future<void> playLevelUp() => _playSfx(_sfxLevelUp, 'level_up.mp3');
+  Future<void> playPurchase() => _playSfx(_sfxPurchase, 'purchase.mp3');
 
-  // ── SFX ───────────────────────────────────────────
-  Future<void> playBtnClick() => _playSfx('btn_click.mp3');
-  Future<void> playCardFlip() => _playSfx('card_flip.mp3');
-  Future<void> playCorrect() => _playSfx('correct.mp3');
-  Future<void> playWrong() => _playSfx('wrong.mp3');
-  Future<void> playLevelUp() => _playSfx('level_up.mp3');
-  Future<void> playPurchase() => _playSfx('purchase.mp3');
-
-  Future<void> _playSfx(String file) async {
+  Future<void> _playSfx(AudioPlayer player, String file) async {
     if (_masterMuted) return;
-    await _sfxPlayer.stop();
-    await _sfxPlayer.setVolume(_sfxVolume);
-    await _sfxPlayer.play(AssetSource('sounds/$file'));
+    try {
+      await player.setVolume(_sfxVol);
+      await player.play(AssetSource('sounds/$file'));
+    } catch (_) {}
   }
 
-  // ── BGM ───────────────────────────────────────────
-  Future<void> playBgm(String file) async {
-    if (_masterMuted || _musicMuted) return;
-    await _musicPlayer.setVolume(_bgmVolume);
-    await _musicPlayer.setReleaseMode(ReleaseMode.loop);
-    await _musicPlayer.play(AssetSource('sounds/$file'));
+  // ── BGM ───────────────────────────────────────────────────────
+  Future<void> startBgm() async {
+    try {
+      await _musicPlayer.setVolume(_bgmVol);
+      await _musicPlayer.play(AssetSource('sounds/bgm_music.mp3'));
+    } catch (_) {}
   }
 
   Future<void> stopBgm() => _musicPlayer.stop();
   Future<void> pauseBgm() => _musicPlayer.pause();
+
   Future<void> resumeBgm() async {
-    if (_masterMuted || _musicMuted) return;
-    await _musicPlayer.resume();
+    try {
+      await _musicPlayer.setVolume(_bgmVol);
+      // ถ้าหยุดเล่นไปแล้ว ให้เริ่มใหม่
+      final state = _musicPlayer.state;
+      if (state == PlayerState.stopped || state == PlayerState.completed) {
+        await startBgm();
+      } else {
+        await _musicPlayer.resume();
+      }
+    } catch (_) {}
   }
 
-  Future<void> startBgm() async {
-    await _musicPlayer.setVolume(_bgmVolume);
-    await _musicPlayer.setReleaseMode(ReleaseMode.loop);
-    await _musicPlayer.play(AssetSource('sounds/bgm_music.mp3'));
-  }
-
-  // ── Volume Control ────────────────────────────────
+  // ── Volume & Mute ─────────────────────────────────────────────
   Future<void> setMasterVolume(double v) async {
     _masterVolume = v;
-    await _sfxPlayer.setVolume(_sfxVolume);
-    await _musicPlayer.setVolume(_bgmVolume);
+    await _musicPlayer.setVolume(_bgmVol);
     _save();
   }
 
   Future<void> setMusicVolume(double v) async {
     _musicVolume = v;
-    await _musicPlayer.setVolume(_bgmVolume);
+    await _musicPlayer.setVolume(_bgmVol);
     _save();
   }
 
   Future<void> toggleMasterMute() async {
     _masterMuted = !_masterMuted;
-    await _sfxPlayer.setVolume(_sfxVolume);
-    await _musicPlayer.setVolume(_bgmVolume);
-    if (_masterMuted) {
-      await _musicPlayer.pause();
-    } else {
-      await _musicPlayer.resume();
-    }
+    await _musicPlayer.setVolume(_bgmVol);
+    if (!_masterMuted) await resumeBgm();
     _save();
   }
 
   Future<void> toggleMusicMute() async {
     _musicMuted = !_musicMuted;
-    await _musicPlayer.setVolume(_bgmVolume);
-    if (_musicMuted) {
-      await _musicPlayer.pause();
-    } else {
-      await _musicPlayer.resume();
-    }
+    await _musicPlayer.setVolume(_bgmVol);
+    if (!_musicMuted) await resumeBgm();
     _save();
   }
 
@@ -118,7 +154,7 @@ class AudioService {
   }
 
   void dispose() {
-    _sfxPlayer.dispose();
     _musicPlayer.dispose();
+    for (final p in _sfxPlayers) p.dispose();
   }
 }

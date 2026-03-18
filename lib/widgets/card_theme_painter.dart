@@ -2,13 +2,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-/// วาด mini card preview ที่มี pattern + icon เฉพาะแต่ละธีม
 class CardThemePainter extends CustomPainter {
   final String themeId;
   final Color bg;
   final Color accent;
-  final bool
-  isBack; // true = ด้านหลัง (แสดง pattern), false = ด้านหน้า (แสดง icon)
+  final bool isBack;
 
   CardThemePainter({
     required this.themeId,
@@ -22,7 +20,6 @@ class CardThemePainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // พื้นหลัง gradient
     final bgPaint = Paint()
       ..shader = LinearGradient(
         colors: [bg, _darken(bg, 0.08)],
@@ -35,10 +32,10 @@ class CardThemePainter extends CustomPainter {
     );
     canvas.drawRRect(rrect, bgPaint);
 
-    // border เฉพาะธีม
+    // border
     _drawBorder(canvas, size, rrect);
 
-    // pattern หรือ icon
+    // pattern / icon
     canvas.save();
     canvas.clipRRect(rrect);
     if (isBack) {
@@ -58,13 +55,12 @@ class CardThemePainter extends CustomPainter {
     canvas.drawRRect(rrect, shine);
   }
 
-  // ── Border เฉพาะธีม ─────────────────────────────────────────
+  // ── Border ─────────────────────────────────────────
 
   void _drawBorder(Canvas c, Size s, RRect rrect) {
     Paint p;
     switch (themeId) {
       case 'christmas':
-        // border ลายขาว-แดงสลับ
         p = Paint()
           ..shader = SweepGradient(
             colors: [
@@ -79,7 +75,6 @@ class CardThemePainter extends CustomPainter {
           ..style = PaintingStyle.stroke;
         break;
       case 'chinese_new_year':
-        // border ทอง
         p = Paint()
           ..shader = SweepGradient(
             colors: [
@@ -92,7 +87,6 @@ class CardThemePainter extends CustomPainter {
           ..style = PaintingStyle.stroke;
         break;
       case 'halloween':
-        // border ส้มเรืองแสง
         p = Paint()
           ..color = const Color(0xFFFF6D00)
           ..strokeWidth = 3
@@ -100,7 +94,6 @@ class CardThemePainter extends CustomPainter {
           ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 3);
         break;
       case 'ocean':
-        // border ฟ้าฟอง
         p = Paint()
           ..shader = SweepGradient(
             colors: [Colors.cyan, Colors.blue.shade300, Colors.cyan],
@@ -109,7 +102,6 @@ class CardThemePainter extends CustomPainter {
           ..style = PaintingStyle.stroke;
         break;
       case 'sakura':
-        // border ชมพูอ่อน
         p = Paint()
           ..shader = SweepGradient(
             colors: [
@@ -131,7 +123,7 @@ class CardThemePainter extends CustomPainter {
     c.drawRRect(rrect, p);
   }
 
-  // ── Pattern ด้านหลัง ────────────────────────────────────────
+  // ── Pattern ────────────────────────────────────────
 
   void _drawPattern(Canvas c, Size s) {
     switch (themeId) {
@@ -155,17 +147,15 @@ class CardThemePainter extends CustomPainter {
     }
   }
 
-  // ── Icon ด้านหน้า ───────────────────────────────────────────
+  // ── Icon ───────────────────────────────────────────
 
   void _drawFrontIcon(Canvas c, Size s) {
-    // ด้านหน้าการ์ด — วาด pattern เบาๆ เท่านั้น ไม่มีตัวอักษร
     _drawPattern(c, s);
   }
 
   // ── Patterns ────────────────────────────────────────────────
 
   void _patternChristmas(Canvas c, Size s) {
-    // ❄️ เกล็ดหิมะ
     final snowP = Paint()
       ..color = Colors.white.withOpacity(0.35)
       ..strokeWidth = 1.2
@@ -200,7 +190,7 @@ class CardThemePainter extends CustomPainter {
         starP,
       );
     }
-    // 🟥 กล่องของขวัญ เล็กๆ
+    // 🟥 กล่องของขวัญ
     final boxP = Paint()..color = Colors.red.withOpacity(0.22);
     final ribbonP = Paint()
       ..color = Colors.yellow.withOpacity(0.35)
@@ -278,7 +268,7 @@ class CardThemePainter extends CustomPainter {
         ringP,
       );
     }
-    // 🏮 โคมไฟ (ellipse + เส้นห้อย)
+    // 🏮 โคมไฟ
     final lanternP = Paint()..color = Colors.red.withOpacity(0.28);
     final stringP = Paint()
       ..color = const Color(0xFFFFD700).withOpacity(0.4)
@@ -324,7 +314,7 @@ class CardThemePainter extends CustomPainter {
         dp,
       );
     }
-    // ลวดลายคลื่น
+    // คลื่น
     final waveP = Paint()
       ..color = const Color(0xFFFFD700).withOpacity(0.12)
       ..strokeWidth = 1
@@ -343,7 +333,7 @@ class CardThemePainter extends CustomPainter {
   }
 
   void _patternHalloween(Canvas c, Size s) {
-    // 🕸️ ใยแมงมุม 2 มุม
+    // 🕸️ ใยแมงมุม
     final wp = Paint()
       ..color = Colors.white.withOpacity(0.18)
       ..strokeWidth = 0.8
@@ -383,7 +373,7 @@ class CardThemePainter extends CustomPainter {
         wp,
       );
     }
-    // 🦇 ค้างคาว (สามเหลี่ยมเล็ก)
+    // 🦇 ค้างคาว
     final batP = Paint()..color = Colors.purple.shade900.withOpacity(0.3);
     for (final pos in [
       [0.25, 0.25],
@@ -541,7 +531,7 @@ class CardThemePainter extends CustomPainter {
   }
 
   void _patternSakura(Canvas c, Size s) {
-    // 🌸 ดอกซากุระหลายขนาด
+    // 🌸 ดอกซากุระ
     for (final item in [
       [0.15, 0.15, 0.09, 0.3],
       [0.8, 0.12, 0.07, 0.22],
@@ -560,7 +550,7 @@ class CardThemePainter extends CustomPainter {
         p,
       );
     }
-    // กลีบร่วง (เส้นรี)
+    // กลีบร่วง
     final petalP = Paint()..color = Colors.pink.withOpacity(0.18);
     for (final pos in [
       [0.35, 0.32],
@@ -610,7 +600,7 @@ class CardThemePainter extends CustomPainter {
     }
   }
 
-  // ── Shape helpers ───────────────────────────────────────────
+  // ── Shape ───────────────────────────────────────────
 
   void _drawStar(Canvas c, Offset center, double size, Paint p) {
     final path = Path();

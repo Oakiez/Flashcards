@@ -31,8 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         height: MediaQuery.of(context).size.height * 0.92,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFFF9F0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(

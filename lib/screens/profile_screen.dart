@@ -58,7 +58,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // 🆕 dialog เลือก Title
+  // เลือก Title
   void _showSelectTitleDialog(BuildContext context, DeckProvider provider) {
     final user = provider.user;
     showModalBottomSheet(
@@ -454,25 +454,6 @@ class ProfileScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 30),
-
-              // // ── Debug ────────────────────────────
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 50),
-              //   child: OutlinedButton.icon(
-              //     style: OutlinedButton.styleFrom(
-              //       foregroundColor: Colors.orange,
-              //       side: const BorderSide(color: Colors.orange),
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(15),
-              //       ),
-              //     ),
-              //     icon: const Icon(Icons.add_circle_outline),
-              //     label: const Text('Debug: +500 Coins'),
-              //     onPressed: () => deckProvider.debugAddCoins(500),
-              //   ),
-              // ),
-              const SizedBox(height: 16),
-
               // ── ถอดกรอบ ──────────────────────────
               if (user.selectedFrame != null)
                 TextButton.icon(

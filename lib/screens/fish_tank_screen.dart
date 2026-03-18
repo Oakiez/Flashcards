@@ -501,7 +501,7 @@ class _FishTankScreenState extends State<FishTankScreen>
     );
   }
 
-  // ✅ แสง glow จากตะเกียง
+  // แสงจากตะเกียง
   Widget _buildLampGlow(FishTank tank, BoxConstraints c) {
     if (tank.lampColor.isEmpty) return const SizedBox();
     final color = _lampColor(tank.lampColor);
@@ -566,7 +566,7 @@ class _FishTankScreenState extends State<FishTankScreen>
     }
   }
 
-  // ── จัดวาง: ฝั่งซ้าย = พืช, กลาง = ปะการัง/หิน, ขวา = ปราสาท/สมอ ──
+  // ── จัดวาง ──
 
   Widget _buildPlant(BoxConstraints c) => Positioned(
     bottom: c.maxHeight * 0.09,

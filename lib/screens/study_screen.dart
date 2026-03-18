@@ -49,7 +49,7 @@ class _StudyScreenState extends State<StudyScreen> {
     };
   }
 
-  // 🆕 emoji ของ theme สำหรับ decoration มุมการ์ด
+  // emoji ของ theme สำหรับ decoration มุมการ์ด
   String get _themeEmoji {
     final themeData = DeckProvider.getCardThemeData(_deck.cardTheme);
     final id = themeData['id'] as String;
@@ -208,7 +208,7 @@ class _StudyScreenState extends State<StudyScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 🆕 Card — ใช้สีจาก theme
+            // Card — ใช้สีจาก theme
             Expanded(
               child: GestureDetector(
                 onTap: () {
@@ -339,7 +339,7 @@ class _StudyScreenState extends State<StudyScreen> {
                                       card.backImagePath != null)
                                     const SizedBox(height: 16),
 
-                                  // กล่องข้อความ contrast — โดดเด่นออกมาจากพื้นหลัง
+                                  // กล่องข้อความ contrast
                                   Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.symmetric(

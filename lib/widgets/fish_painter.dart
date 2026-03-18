@@ -2,7 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-// ── FishPainter — Vector ปลาสวยงาม ─────────────────────────────
+// ── FishPainter ─────────────────────────────
 
 class FishPainter extends CustomPainter {
   final String fishType;
@@ -46,7 +46,7 @@ class FishPainter extends CustomPainter {
     canvas.restore();
   }
 
-  // ── Helper: วาดลำตัวหลัก ──────────────────────────────────────
+  // ── ลำตัว ──────────────────────────────────────
   void _drawBody(Canvas c, Size s, List<Color> gradient) {
     final w = s.width;
     final h = s.height;
@@ -75,7 +75,7 @@ class FishPainter extends CustomPainter {
     c.drawPath(shinePath, Paint()..color = Colors.white.withOpacity(0.25));
   }
 
-  // ── Helper: วาดหาง ────────────────────────────────────────────
+  // ── วาดหาง ────────────────────────────────────────────
   void _drawTail(Canvas c, Size s, Color tailColor, {double spread = 1.0}) {
     final w = s.width;
     final h = s.height;
@@ -129,7 +129,7 @@ class FishPainter extends CustomPainter {
     c.drawPath(tailPath2, tailPaint);
   }
 
-  // ── Helper: ครีบหลัง ──────────────────────────────────────────
+  // ── ครีบหลัง ──────────────────────────────────────────
   void _drawDorsalFin(Canvas c, Size s, Color finColor) {
     final w = s.width;
     final h = s.height;
@@ -140,7 +140,7 @@ class FishPainter extends CustomPainter {
     c.drawPath(finPath, Paint()..color = finColor.withOpacity(0.75));
   }
 
-  // ── Helper: ครีบท้อง ──────────────────────────────────────────
+  // ── ครีบท้อง ──────────────────────────────────────────
   void _drawPectoralFin(Canvas c, Size s, Color finColor) {
     final w = s.width;
     final h = s.height;
@@ -151,11 +151,11 @@ class FishPainter extends CustomPainter {
     c.drawPath(finPath, Paint()..color = finColor.withOpacity(0.7));
   }
 
-  // ── Helper: ตา ────────────────────────────────────────────────
+  // ── ตา ────────────────────────────────────────────────
   void _drawEye(Canvas c, Size s) {
     final w = s.width;
     final h = s.height;
-    // ขาวตา
+    // ตาขาว
     c.drawCircle(
       Offset(w * 0.68, h * 0.36),
       w * 0.075,
@@ -175,7 +175,7 @@ class FishPainter extends CustomPainter {
     );
   }
 
-  // ── นีโม่ — ส้ม+ขาว ──────────────────────────────────────────
+  // ── นีโม่ ──────────────────────────────────────────
   void _drawNemo(Canvas c, Size s) {
     final w = s.width;
     final h = s.height;
@@ -227,7 +227,7 @@ class FishPainter extends CustomPainter {
     final w = s.width;
     final h = s.height;
 
-    // หางสวย 2 แฉก
+    // หาง 2 แฉก
     final tail1 = Path()
       ..moveTo(w * 0.2, h * 0.5)
       ..cubicTo(w * 0.05, h * 0.08, 0, h * 0.02, w * 0.06, h * 0.12)
@@ -258,7 +258,7 @@ class FishPainter extends CustomPainter {
       const Color(0xFFFFC107),
     ]);
 
-    // ลาย scale เล็กๆ
+    // scale เล็กๆ
     final scalePaint = Paint()
       ..color = const Color(0xFFB8860B).withOpacity(0.3)
       ..strokeWidth = w * 0.012
@@ -282,7 +282,7 @@ class FishPainter extends CustomPainter {
     _drawEye(c, s);
   }
 
-  // ── Blue Tang (ปลาสีน้ำเงิน) ─────────────────────────────────
+  // ── Blue Tang─────────────────────────────────
   void _drawBlueTang(Canvas c, Size s) {
     final w = s.width;
     final h = s.height;
@@ -297,7 +297,7 @@ class FishPainter extends CustomPainter {
       const Color(0xFF0D47A1),
     ]);
 
-    // เส้นสีเหลืองข้างตัว (Blue Tang signature)
+    // เส้นสีเหลืองข้างตัว
     final linePaint = Paint()
       ..color = const Color(0xFFFFEB3B).withOpacity(0.85)
       ..strokeWidth = h * 0.07
@@ -325,12 +325,12 @@ class FishPainter extends CustomPainter {
     _drawEye(c, s);
   }
 
-  // ── Angelfish (ปลาเทวดา) ─────────────────────────────────────
+  // ── Angelfish ─────────────────────────────────────
   void _drawAngelfish(Canvas c, Size s) {
     final w = s.width;
     final h = s.height;
 
-    // ครีบบน-ล่างยาว (signature ของ angelfish)
+    // ครีบบน-ล่างยาว
     final topFin = Path()
       ..moveTo(w * 0.4, h * 0.08)
       ..cubicTo(w * 0.55, h * -0.25, w * 0.7, h * -0.15, w * 0.75, h * 0.1)
@@ -372,7 +372,7 @@ class FishPainter extends CustomPainter {
       const Color(0xFFE0E0E0),
     ]);
 
-    // แถบดำ 3 เส้น (angelfish signature)
+    // แถบดำ 3 เส้น
     final stripePaint = Paint()
       ..color = const Color(0xFF2C2C2C).withOpacity(0.7)
       ..strokeWidth = w * 0.065
@@ -441,7 +441,7 @@ class FishPainter extends CustomPainter {
       old.facingRight != facingRight;
 }
 
-// ── FishWidget — Widget wrapper ─────────────────────────────────
+// ── FishWidget ─────────────────────────────────
 
 class FishWidget extends StatelessWidget {
   final String fishType;
@@ -459,11 +459,11 @@ class FishWidget extends StatelessWidget {
     this.facingRight = true,
   });
 
-  /// ใช้ในร้านค้า — ขนาดใหญ่สำหรับ tile
+  /// ใช้ในร้านค้า
   factory FishWidget.tile(String type, Color color) =>
       FishWidget(fishType: type, color: color, width: 90, height: 56);
 
-  /// ใช้ในตู้ปลา — ขนาดจาก constraints
+  /// ใช้ในตู้ปลา
   factory FishWidget.tank(String type, Color color, double w) =>
       FishWidget(fishType: type, color: color, width: w, height: w * 0.62);
 

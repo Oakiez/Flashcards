@@ -75,7 +75,7 @@ class StoreScreen extends StatelessWidget {
     );
   }
 
-  // ── Tab 1: ธีมการ์ด ──────────────────────────────────────────
+  // ── ธีมการ์ด ──────────────────────────────────────────
 
   Widget _buildCardThemeTab(BuildContext context, DeckProvider provider) {
     final themes = DeckProvider.cardThemeCatalog;
@@ -290,7 +290,7 @@ class StoreScreen extends StatelessWidget {
     );
   }
 
-  // ── Tab 2: ไอคอนสำรับ ────────────────────────────────────────
+  // ── ไอคอนสำรับ ────────────────────────────────────────
 
   Widget _buildDeckIconTab(BuildContext context, DeckProvider provider) {
     final icons = DeckProvider.deckIconCatalog;
@@ -427,7 +427,7 @@ class StoreScreen extends StatelessWidget {
     );
   }
 
-  // ── Tab 3: กรอบ & ตู้ปลา ─────────────────────────────────────
+  // ── กรอบ & ตู้ปลา ─────────────────────────────────────
 
   Widget _buildItemAndFishTab(BuildContext context, DeckProvider provider) {
     return _InnerFishItemTab(
@@ -480,7 +480,6 @@ class StoreScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // ✅ Preview กรอบ
                   SizedBox(
                     width: 90,
                     height: 90,
@@ -496,7 +495,6 @@ class StoreScreen extends StatelessWidget {
                             size: 36,
                           ),
                         ),
-                        // ✅ ใช้ FramePainter (ไม่มี underscore)
                         SizedBox(
                           width: 82,
                           height: 82,

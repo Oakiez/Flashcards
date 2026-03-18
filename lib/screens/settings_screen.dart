@@ -422,7 +422,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.clear();
     if (!context.mounted) return;
     context.read<DeckProvider>().resetAllData();
-    await context.read<ThemeProvider>().setTheme('green'); // ← เพิ่มบรรทัดนี้
+    await context.read<ThemeProvider>().setTheme('green');
     await AudioService.instance.startBgm();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const TutorialScreen()),
